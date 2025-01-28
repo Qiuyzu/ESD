@@ -1,6 +1,16 @@
 from flask import Flask, request, jsonify
+import mysql.connector
 
 app = Flask(__name__)
+
+# MySQL database / MongoDB connection configuration
+db_config = {
+    'host': 'localhost',
+    'port': 3306,
+    'user': '',  # Replace with your MySQL username
+    'password': '',  # Replace with your MySQL password
+    'database': 'example_db'  # Replace with your database name
+}
 
 # In-memory database for demonstration purposes
 users = {}
@@ -17,22 +27,29 @@ def create_user():
 
     if user_id in users:
         return jsonify({'error': 'User ID already exists'}), 400
+    
+    # Insert user into MySQL database
+    try:
+        connection = mysql.connector.connect(**db_config)
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO example_db.users (id, name) VALUES (%s, %s)", (user_id, name))
+        connection.commit()
+        cursor.close()
+        connection.close()
+    except mysql.connector.Error as err:
+        return jsonify({'error': f'Database error: {err}'}), 500
 
     users[user_id] = {'id': user_id, 'name': name}
     return jsonify({'message': 'User created successfully', 'user': users[user_id]}), 201
 
-@app.route('/users/id=<user_id>', methods=['GET'])
-def get_user(user_id):
-    user = users.get(user_id)
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
-
-    return jsonify({'user': user}), 200
-
 @app.route('/users', methods=['GET'])
-def get_user_by_header():
-    user_id = request.headers.get('id')
-    name = request.headers.get('user')
+def get_user():
+    # using header
+    # user_id = request.headers.get('id')
+    # name = request.headers.get('user')
+    # using query parameter
+    user_id = request.args.get('id')
+    name = request.args.get('user')
 
     if user_id:
         user = users.get(user_id)
