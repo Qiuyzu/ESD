@@ -8,7 +8,7 @@ db_config = {
     'host': 'localhost',
     'port': 3306,
     'user': 'root',  # Replace with your MySQL username
-    'password': 'root',  # Replace with your MySQL password
+    'password': 'password',  # Replace with your MySQL password
     'database': 'example_db'  # Replace with your database name
 }
 
