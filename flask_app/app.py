@@ -41,7 +41,7 @@ def create_user():
 
     users[user_id] = {'id': user_id, 'name': name}
     return jsonify({'message': 'User created successfully', 'user': users[user_id]}), 201
-
+/
 @app.route('/users', methods=['GET'])
 def get_user():
     # using header
